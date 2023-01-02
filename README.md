@@ -2,6 +2,8 @@
 
 LightBnB is a simple AirBnB clone that uses server-side Javascript to display the information from queries to web pages via SQL queries!
 
+## Getting Started
+
 1. [Create](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template) a new repository using this repository as a template.
 2. Clone your repository onto your local device.
 3. Install dependencies using the `npm install` command.
@@ -10,10 +12,10 @@ LightBnB is a simple AirBnB clone that uses server-side Javascript to display th
 
 ## Dependencies
 
-Node
-bcrypt
-body-parser
-cookie-session
-express
-nodemon
-postgres
+- Node
+- bcrypt
+- body-parser
+- cookie-session
+- express
+- nodemon
+- postgres
