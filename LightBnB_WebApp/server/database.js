@@ -1,3 +1,4 @@
+const { query } = require("express");
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -110,20 +111,21 @@ const getAllProperties = function (options, limit = 10) {
               SELECT properties.*, avg(property_reviews.rating) as average_rating
               FROM properties
               JOIN property_reviews ON properties.id = property_id
+              GROUP BY properties.id
               `;
 
     // 3
 
     if (options.city) {
         queryParams.push(`%${options.city}%`);
-        queryString += `WHERE city LIKE $${queryParams.length} `;
+        queryString += `HAVING city LIKE $${queryParams.length} `;
     } 
     if (options.owner_id) {
         queryParams.push(options.owner_id);
         if (queryParams.length > 1) {
             queryString += `AND owner_id = $${queryParams.length} `;
         } else {
-            queryString += `WHERE owner_id = $${queryParams.length} `;
+            queryString += `HAVING owner_id = $${queryParams.length} `;
         }
     } 
     if (options.minimum_price_per_night) {
@@ -131,7 +133,7 @@ const getAllProperties = function (options, limit = 10) {
         if (queryParams.length > 1) {
             queryString += `AND cost_per_night/100 >= $${queryParams.length} `;
         } else {
-            queryString += `WHERE cost_per_night/100 >= $${queryParams.length} `;
+            queryString += `HAVING cost_per_night/100 >= $${queryParams.length} `;
         }
     }
     if (options.maximum_price_per_night) {
@@ -139,14 +141,21 @@ const getAllProperties = function (options, limit = 10) {
         if (queryParams.length > 1) {
             queryString += `AND cost_per_night/100 < $${queryParams.length} `;
         } else {
-            queryString += `WHERE cost_per_night/100 < $${queryParams.length} `;
+            queryString += `HAVING cost_per_night/100 < $${queryParams.length} `;
         }
+    }
+    if (options.minimum_rating) {
+      queryParams.push(`${options.minimum_rating}`);
+      if (queryParams.length > 1) {
+          queryString += `AND avg(property_reviews.rating) >= $${queryParams.length} `;
+      } else {
+          queryString += `HAVING avg(property_reviews.rating) >= $${queryParams.length} `;
+      }
     }
 
     // 4
     queryParams.push(limit);
     queryString += `
-    GROUP BY properties.id
     ORDER BY cost_per_night
     LIMIT $${queryParams.length};
     `;
